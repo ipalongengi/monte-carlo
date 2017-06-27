@@ -6,20 +6,22 @@ import java.util.Collections;
 public class Simulation {
 
     private final ArrayList<Double>numArray;
-    private final int[] buckets;
+    private final int[] freqBins;
     private final Double binRange;
+    private final int maxFreq;
 
     public Simulation(int numElements, int numBins){
         numArray = new ArrayList<>(numElements);
         generateNormalRandomNumbers(numArray, numElements);
-        buckets = makeBins(numArray, numBins);
+        freqBins = makeBins(numArray, numBins);
         binRange = getRange(numArray) / numBins;
+        maxFreq = findMaxFreq(freqBins);
     }
 
     private static void generateNormalRandomNumbers(ArrayList<Double> numArray, int num){
         Random randomGenerator = new Random();
         for (int i = 0; i < num; i++){
-            numArray.add(i, randomGenerator.nextGaussian() * 100);
+            numArray.add(i, randomGenerator.nextGaussian());
         }
     }
 
@@ -54,6 +56,16 @@ public class Simulation {
         return getMax(numArray) - getMin(numArray);
     }
 
+    private static int findMaxFreq(int[] buckets){
+        int max = 0;
+        for (int freq: buckets){
+            if (freq > max){
+                max = freq;
+            }
+        }
+        return max;
+    }
+
     public int getBin(double randNum){
         return (int) ((randNum - getMin(numArray)) / binRange);
     }
@@ -62,12 +74,24 @@ public class Simulation {
         return numArray;
     }
 
+    public double getRange(){
+        return binRange;
+    }
+
     public int[] getBuckets(){
-        return buckets;
+        return freqBins;
+    }
+
+    public int getSampleSize() {
+        return numArray.size();
+    }
+
+    public int getMaxFreq(){
+        return maxFreq;
     }
 
     public String toString(){
-        return String.format("Total Elements: %d, Num of Buckets: %d, Min: %f, Max: %f, Range: %f",
-                numArray.size(), buckets.length,  getMin(numArray), getMax(numArray), getRange(numArray));
+        return String.format("Total Elements: %d, Num of Buckets: %d, Min: %f, Max: %f, Range: %f, Max Freq: %d",
+                getSampleSize(), freqBins.length,  getMin(numArray), getMax(numArray), getRange(numArray), getMaxFreq());
     }
 }
